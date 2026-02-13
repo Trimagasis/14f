@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#c92148" />
+		<title>Валентинка для любимой</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Manrope:wght@500;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="./styles.css" />
+	</head>
+	<body>
+		<div class="ambient" aria-hidden="true">
+			<div class="ambient-shape shape-a"></div>
+			<div class="ambient-shape shape-b"></div>
+			<div class="ambient-shape shape-c"></div>
+		</div>
+
+		<main class="stage" id="stage" aria-hidden="true"></main>
+		<button
+			id="ui-compact-toggle"
+			class="ui-compact-toggle"
+			type="button"
+			aria-label="Свернуть интерфейс"
+			title="Свернуть интерфейс"
+		>
+			−
+		</button>
+
+		<section class="love-note" aria-label="Послание">
+			<div class="note-card" id="note-card">
+				<h1>Для тебя, моё солнце</h1>
+				<button id="open-message-menu" class="open-message-btn" type="button">
+					Открыть послание
+				</button>
+
+				<div id="secret-panel" class="secret-panel" hidden>
+					<div class="secret-form">
+						<label class="sr-only" for="secret-code-input">Секретный код</label>
+						<input
+							id="secret-code-input"
+							type="text"
+							placeholder="Код из армии"
+							autocomplete="off"
+						/>
+						<button id="secret-code-submit" type="button">Открыть</button>
+					</div>
+
+					<p id="secret-code-error" class="secret-error" hidden>
+						Неверный код. Вспомни Саратов :)
+					</p>
+
+					<div id="secret-message" class="secret-message" hidden>
+						<p class="secret-main-text">
+							Я тебя люблю! Правда-правда! Сильно-сильно! Ты у меня самая лучшая
+							и самая красивая :) <br /><br /><br />
+							Можешь скрыть интерфейс на кнопку в правом верхнем углу и
+							насладиться слайдшоу :)
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<script src="./script.js"></script>
+	</body>
+</html>

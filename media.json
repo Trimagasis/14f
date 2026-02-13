@@ -1,0 +1,499 @@
+{
+	"items": [
+		{
+			"type": "image",
+			"url": "./img/photo_2025-09-01_22-49-56.jpg",
+			"name": "Наш момент"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-09-21_11-21-06.jpg",
+			"name": "Воспоминание"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-09-21_11-28-30.jpg",
+			"name": "Время вместе"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-09-21_11-29-20.jpg",
+			"name": "Счастливые мгновения"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-09-21_11-29-22.jpg",
+			"name": "Мой мир"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-09-24_13-00-09.jpg",
+			"name": "Любимая улыбка"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-09-24_13-01-28.jpg",
+			"name": "Прекрасный день"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-10-08_19-10-53.jpg",
+			"name": "Осенние моменты"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-10-08_19-11-44.jpg",
+			"name": "Вместе"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-10-12_14-44-39.jpg",
+			"name": "Память"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-10-12_19-09-00.jpg",
+			"name": "Один из лучших дней"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-10-12_19-09-15.jpg",
+			"name": "С тобой"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-10-15_18-23-56.jpg",
+			"name": "Особенный миг"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-10-19_17-27-59.jpg",
+			"name": "Улыбка"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-10-19_17-28-23.jpg",
+			"name": "Красота"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-10-20_17-30-43.jpg",
+			"name": "Моя любовь"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-10-22_22-16-40.jpg",
+			"name": "Волшебство"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-11-21_20-30-41.jpg",
+			"name": "Звездная ночь"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-11-29_21-20-10.jpg",
+			"name": "Я люблю тебя"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-12-06_14-32-07.jpg",
+			"name": "Свет в тиши"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-12-06_14-32-41.jpg",
+			"name": "Зимняя сказка"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-12-06_14-32-47.jpg",
+			"name": "Тепло"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-12-06_14-57-27.jpg",
+			"name": "Новогодние чудеса"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-12-06_14-57-55.jpg",
+			"name": "Вечность"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-12-16_21-27-55.jpg",
+			"name": "Праздник"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-12-19_18-38-01.jpg",
+			"name": "Новый год"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2025-12-21_16-52-20.jpg",
+			"name": "Зима"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-01-13_11-11-15.jpg",
+			"name": "Сейчас"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5188635289357253257_w.jpg",
+			"name": "Фото 1"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5192790837719857115_y.jpg",
+			"name": "Фото 2"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5192790837719857131_y.jpg",
+			"name": "Фото 3"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5195042637533540772_y.jpg",
+			"name": "Фото 4"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5199418092516671125_w.jpg",
+			"name": "Фото 5"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5199418092516671153_w.jpg",
+			"name": "Фото 6"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5219813595125250927_y.jpg",
+			"name": "Фото 7"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5237900303704133416_w.jpg",
+			"name": "Фото 8"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5258497497976928150_y.jpg",
+			"name": "Фото 9"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5278221662837406375_y.jpg",
+			"name": "Фото 10"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5397726391958179759_y.jpg",
+			"name": "Фото 11"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5397726391958179770_y.jpg",
+			"name": "Фото 12"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5418106187871358651_w.jpg",
+			"name": "Фото 13"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5433800419277739211_w.jpg",
+			"name": "Фото 14"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-10-04.jpg",
+			"name": "Фото 15"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-10-08.jpg",
+			"name": "Фото 16"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-10-11.jpg",
+			"name": "Фото 17"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-10-12.jpg",
+			"name": "Фото 18"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-10-49.jpg",
+			"name": "Фото 19"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-10-53.jpg",
+			"name": "Фото 20"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-10-57.jpg",
+			"name": "Фото 21"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-12-42.jpg",
+			"name": "Фото 22"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-12-48.jpg",
+			"name": "Фото 23"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-13-01.jpg",
+			"name": "Фото 24"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-13-12.jpg",
+			"name": "Фото 25"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-13-18.jpg",
+			"name": "Фото 26"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-13-21.jpg",
+			"name": "Фото 27"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-13-30.jpg",
+			"name": "Фото 28"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-13-37.jpg",
+			"name": "Фото 29"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-13-42.jpg",
+			"name": "Фото 30"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-13-44.jpg",
+			"name": "Фото 31"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-13-59.jpg",
+			"name": "Фото 32"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-14-06.jpg",
+			"name": "Фото 33"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-14-09.jpg",
+			"name": "Фото 34"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-14-14.jpg",
+			"name": "Фото 35"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-14-19.jpg",
+			"name": "Фото 36"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-14-22.jpg",
+			"name": "Фото 37"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2026-02-14_00-16-19.jpg",
+			"name": "Фото 38"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_1983.MOV",
+			"name": "Видео 1"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_4574.MOV",
+			"name": "Видео 2"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_0832.MOV",
+			"name": "Видео 3"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_1166.MOV",
+			"name": "Видео 4"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_1785.MOV",
+			"name": "Видео 5"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_1878.MOV",
+			"name": "Видео 6"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_3459.MOV",
+			"name": "Видео 7"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_3519.MOV",
+			"name": "Видео 8"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_3848.MOV",
+			"name": "Видео 9"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_3898.MOV",
+			"name": "Видео 10"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_3943.MOV",
+			"name": "Видео 11"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_5943.MOV",
+			"name": "Видео 12"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_1_2026-02-14_00-28-23.jpg",
+			"name": "Фото 67"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_1_2026-02-14_00-28-32.jpg",
+			"name": "Фото 68"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_10_2026-02-14_00-28-32.jpg",
+			"name": "Фото 69"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2_2026-02-14_00-28-23.jpg",
+			"name": "Фото 70"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_2_2026-02-14_00-28-32.jpg",
+			"name": "Фото 71"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_3_2026-02-14_00-28-23.jpg",
+			"name": "Фото 72"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_3_2026-02-14_00-28-32.jpg",
+			"name": "Фото 73"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_4_2026-02-14_00-28-23.jpg",
+			"name": "Фото 74"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_4_2026-02-14_00-28-32.jpg",
+			"name": "Фото 75"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5_2026-02-14_00-28-23.jpg",
+			"name": "Фото 76"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_5_2026-02-14_00-28-32.jpg",
+			"name": "Фото 77"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_6_2026-02-14_00-28-23.jpg",
+			"name": "Фото 78"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_6_2026-02-14_00-28-32.jpg",
+			"name": "Фото 79"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_7_2026-02-14_00-28-23.jpg",
+			"name": "Фото 80"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_7_2026-02-14_00-28-32.jpg",
+			"name": "Фото 81"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_8_2026-02-14_00-28-32.jpg",
+			"name": "Фото 82"
+		},
+		{
+			"type": "image",
+			"url": "./img/photo_9_2026-02-14_00-28-32.jpg",
+			"name": "Фото 83"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_3253.MOV",
+			"name": "Видео 13"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_3809.MOV",
+			"name": "Видео 14"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_3848 (2).MOV",
+			"name": "Видео 15"
+		},
+		{
+			"type": "video",
+			"url": "./video/IMG_3978.MOV",
+			"name": "Видео 16"
+		}
+	]
+}
