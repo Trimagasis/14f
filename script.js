@@ -43,6 +43,10 @@ const EQ_BAND_FLOOR_RISE = 0.004;
 const EQ_BAND_FLOOR_FALL = 0.32;
 const EQ_BAND_PEAK_DECAY = 0.978;
 const EQ_BAND_MIN_RANGE = 0.08;
+const EQ_FPS_PHONE = 30;
+const EQ_FPS_MOBILE = 40;
+const EQ_FPS_DESKTOP = 60;
+const EQ_BIN_STEP_PHONE = 2;
 
 const musicVizState = {
 	audioContext: null,
@@ -58,12 +62,31 @@ const musicVizState = {
 	bandPeakLevels: [],
 	energyCeil: 0.3,
 	lastFrameTimeMs: 0,
+	lastRenderTimeMs: 0,
 	rafId: 0,
 };
 
+function isPhoneViewport() {
+	return window.innerWidth <= 430;
+}
+
+function isCompactMobileViewport() {
+	return window.innerWidth < 700;
+}
+
+function isMobileLowPowerDevice() {
+	const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
+	const lowMemory =
+		typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 4;
+	const lowCpu =
+		typeof navigator.hardwareConcurrency === "number" &&
+		navigator.hardwareConcurrency <= 4;
+	return isCompactMobileViewport() && (coarsePointer || lowMemory || lowCpu);
+}
+
 function getMaxActiveCount() {
-	if (window.innerWidth <= 375) return 7;
-	if (window.innerWidth < 800) return 10;
+	if (isPhoneViewport()) return isMobileLowPowerDevice() ? 3 : 4;
+	if (window.innerWidth < 800) return isMobileLowPowerDevice() ? 6 : 8;
 	return 14;
 }
 
@@ -72,6 +95,46 @@ function getEqBarCountForViewport() {
 	if (window.innerWidth <= 430) return 76;
 	if (window.innerWidth < 700) return 96;
 	return EQ_BAR_COUNT_DESKTOP;
+}
+
+function getVideoProbability() {
+	if (isPhoneViewport()) return 0.08;
+	if (isCompactMobileViewport()) return 0.12;
+	return 0.18;
+}
+
+function getSpawnDelayRange() {
+	if (isPhoneViewport()) return { min: 2200, max: 4200 };
+	if (isCompactMobileViewport()) return { min: 1750, max: 3400 };
+	return { min: SPAWN_DELAY_MIN_MS, max: SPAWN_DELAY_MAX_MS };
+}
+
+function getPlacementSamples() {
+	if (isPhoneViewport()) return 12;
+	if (isCompactMobileViewport()) return 20;
+	return PLACEMENT_SAMPLES;
+}
+
+function getPlacementPadding() {
+	if (isPhoneViewport()) return 28;
+	if (isCompactMobileViewport()) return 42;
+	return PLACEMENT_PADDING;
+}
+
+function getEqFrameIntervalMs() {
+	if (isPhoneViewport()) return 1000 / EQ_FPS_PHONE;
+	if (isCompactMobileViewport()) return 1000 / EQ_FPS_MOBILE;
+	return 1000 / EQ_FPS_DESKTOP;
+}
+
+function getAnalyserFftSize() {
+	if (isPhoneViewport()) return 1024;
+	if (isCompactMobileViewport()) return 2048;
+	return 4096;
+}
+
+function syncMobilePerformanceMode() {
+	document.body.classList.toggle("mobile-optimized", isMobileLowPowerDevice());
 }
 
 const state = {
@@ -315,7 +378,7 @@ function warmupSomeVideos(targetCount) {
 
 function pickRandomVideoItem() {
 	if (state.videos.length === 0) return null;
-	warmupSomeVideos(VIDEO_PRELOAD_AHEAD);
+	warmupSomeVideos(isPhoneViewport() ? 1 : VIDEO_PRELOAD_AHEAD);
 	const healthyVideos = state.videos.filter((item) => {
 		return state.videoWarmStatus.get(item.url) !== "failed";
 	});
@@ -355,7 +418,7 @@ function pickRandomImageItem() {
 	const readySource = source.filter((item) => {
 		return state.imageWarmStatus.get(item.url) === "ready";
 	});
-	warmupSomeImages(IMAGE_PRELOAD_AHEAD);
+	warmupSomeImages(isPhoneViewport() ? 2 : IMAGE_PRELOAD_AHEAD);
 	if (readySource.length > 0) {
 		return readySource[randomInt(0, readySource.length - 1)];
 	}
@@ -404,9 +467,10 @@ function rememberVideoShown(videoItem) {
 function pickRandomItem() {
 	const hasImages = state.images.length > 0;
 	const hasVideos = state.videos.length > 0;
+	const videoProbability = getVideoProbability();
 
 	if (hasImages && hasVideos) {
-		if (Math.random() < 0.82) {
+		if (Math.random() < 1 - videoProbability) {
 			const imageItem = pickRandomImageItem();
 			return imageItem || pickRandomVideoItem();
 		}
@@ -471,15 +535,17 @@ function createMediaNode(item) {
 function buildFloatElement(item) {
 	const tile = document.createElement("article");
 	tile.className = "media-float";
+	const phone = isPhoneViewport();
+	const compact = isCompactMobileViewport();
 
 	const size = Math.round(
-		window.innerWidth <= 375
-			? randomBetween(280, 420)
-			: window.innerWidth < 800
-				? randomBetween(450, 640)
+		phone
+			? randomBetween(178, 274)
+			: compact
+				? randomBetween(300, 470)
 				: randomBetween(620, 780),
 	);
-	const ratio = randomBetween(0.82, 1.24);
+	const ratio = randomBetween(compact ? 0.9 : 0.82, compact ? 1.14 : 1.24);
 	const width = Math.max(120, Math.round(size * ratio));
 	const height = size;
 
@@ -487,7 +553,9 @@ function buildFloatElement(item) {
 	tile.style.height = `${height}px`;
 	state.zCounter += 1;
 	tile.style.zIndex = `${state.zCounter}`;
-	tile.style.filter = `saturate(${randomBetween(0.9, 1.2).toFixed(2)})`;
+	tile.style.filter = compact
+		? "none"
+		: `saturate(${randomBetween(0.9, 1.2).toFixed(2)})`;
 
 	const mediaNode = createMediaNode(item);
 	tile.appendChild(mediaNode);
@@ -572,11 +640,12 @@ function attachTileMediaState(tile, mediaNode, item) {
 }
 
 function createPlacementRect(x, y, width, height) {
+	const padding = getPlacementPadding();
 	return {
-		x: x - PLACEMENT_PADDING,
-		y: y - PLACEMENT_PADDING,
-		width: width + PLACEMENT_PADDING * 2,
-		height: height + PLACEMENT_PADDING * 2,
+		x: x - padding,
+		y: y - padding,
+		width: width + padding * 2,
+		height: height + padding * 2,
 	};
 }
 
@@ -640,7 +709,8 @@ function findBestStartPosition(width, height) {
 	}
 
 	let best = null;
-	for (let i = 0; i < PLACEMENT_SAMPLES; i += 1) {
+	const samples = getPlacementSamples();
+	for (let i = 0; i < samples; i += 1) {
 		const x = randomBetween(minX, maxX);
 		const y = randomBetween(minY, maxY);
 		const candidate = createPlacementRect(x, y, width, height);
@@ -658,12 +728,13 @@ function findBestStartPosition(width, height) {
 
 function chooseFlightPath(width, height) {
 	const start = findBestStartPosition(width, height);
+	const compact = isCompactMobileViewport();
 	const startX = start.x;
 	const startY = start.y;
-	const endX = startX + randomBetween(-90, 90);
-	const endY = startY + randomBetween(-80, 80);
-	const swayX = randomBetween(-45, 45);
-	const swayY = randomBetween(-40, 40);
+	const endX = startX + randomBetween(compact ? -54 : -90, compact ? 54 : 90);
+	const endY = startY + randomBetween(compact ? -48 : -80, compact ? 48 : 80);
+	const swayX = randomBetween(compact ? -28 : -45, compact ? 28 : 45);
+	const swayY = randomBetween(compact ? -26 : -40, compact ? 26 : 40);
 	const startScale = randomBetween(0.82, 0.98);
 	const midScale = randomBetween(0.98, 1.1);
 	const endScale = randomBetween(0.88, 1.02);
@@ -694,13 +765,16 @@ function chooseAnimationProfile() {
 }
 
 function primeMediaWarmups() {
-	warmupSomeImages(IMAGE_PRELOAD_AHEAD);
-	warmupSomeVideos(VIDEO_PRELOAD_AHEAD);
+	const imageAhead = isPhoneViewport() ? 2 : IMAGE_PRELOAD_AHEAD;
+	const videoAhead = isPhoneViewport() ? 1 : VIDEO_PRELOAD_AHEAD;
+	warmupSomeImages(imageAhead);
+	warmupSomeVideos(videoAhead);
 }
 
 function spawnFloatingItem() {
 	if (state.items.length === 0) return;
 	if (state.activeCount >= state.maxActive) return;
+	const compact = isCompactMobileViewport();
 
 	const item = pickRandomItem();
 	if (!item) return;
@@ -720,17 +794,20 @@ function spawnFloatingItem() {
 
 	stage.appendChild(tile);
 	state.activeCount += 1;
+	const blurEnter = compact ? "blur(0px)" : "blur(14px)";
+	const blurMid = compact ? "blur(0px)" : "blur(8px)";
+	const blurExit = compact ? "blur(0px)" : "blur(12px)";
 
 	const keyframes = [
 		{
 			opacity: 0,
 			transform: `translate3d(${path.startX}px, ${path.startY}px, 0) scale(${path.startScale}) rotate(${path.rotateStart}deg)`,
-			filter: "blur(14px)",
+			filter: blurEnter,
 		},
 		{
 			opacity: 0.42,
 			transform: `translate3d(${path.startX + path.swayX * 0.28}px, ${path.startY + path.swayY * 0.28}px, 0) scale(${(path.startScale + path.midScale) / 2}) rotate(${(path.rotateStart + path.rotateMid) / 2}deg)`,
-			filter: "blur(8px)",
+			filter: blurMid,
 			offset: fadeInOffset * 0.55,
 		},
 		{
@@ -754,7 +831,7 @@ function spawnFloatingItem() {
 		{
 			opacity: 0,
 			transform: `translate3d(${path.endX}px, ${path.endY}px, 0) scale(${path.endScale}) rotate(${path.rotateEnd}deg)`,
-			filter: "blur(12px)",
+			filter: blurExit,
 		},
 	];
 
@@ -765,22 +842,32 @@ function spawnFloatingItem() {
 	});
 
 	animation.onfinish = () => {
+		const videoNode = tile.querySelector("video");
+		if (videoNode) {
+			videoNode.pause();
+			videoNode.removeAttribute("src");
+			videoNode.load();
+		}
 		tile.remove();
 		state.activePlacements.delete(placementId);
 		state.activeCount = Math.max(0, state.activeCount - 1);
 	};
 
 	warmupSomeImages(1);
-	warmupSomeVideos(1);
+	warmupSomeVideos(isPhoneViewport() ? 0 : 1);
 }
 
 function startFloatingScene() {
-	for (let i = 0; i < Math.min(3, state.maxActive); i += 1) {
+	const initialSpawnCount = isPhoneViewport()
+		? Math.min(2, state.maxActive)
+		: Math.min(3, state.maxActive);
+	for (let i = 0; i < initialSpawnCount; i += 1) {
 		setTimeout(spawnFloatingItem, i * randomInt(260, 420));
 	}
 
 	const scheduler = () => {
-		const delay = randomInt(SPAWN_DELAY_MIN_MS, SPAWN_DELAY_MAX_MS);
+		const delayRange = getSpawnDelayRange();
+		const delay = randomInt(delayRange.min, delayRange.max);
 		setTimeout(() => {
 			spawnFloatingItem();
 			scheduler();
@@ -929,6 +1016,7 @@ function rebuildEqBars(count) {
 	musicVizState.previousBandLevels = new Array(musicVizState.bars.length).fill(0);
 	musicVizState.bandFloorLevels = new Array(musicVizState.bars.length).fill(0);
 	musicVizState.bandPeakLevels = new Array(musicVizState.bars.length).fill(0);
+	musicVizState.lastRenderTimeMs = 0;
 	rebuildEqBandRanges();
 }
 
@@ -976,6 +1064,7 @@ function updateEqBars(timestampMs) {
 		const rawBands = new Array(bandCount);
 		let frameEnergy = 0;
 		let frameMaxRaw = 0.0001;
+		const binStep = isPhoneViewport() ? EQ_BIN_STEP_PHONE : 1;
 
 		for (let i = 0; i < bandCount; i += 1) {
 			const range = musicVizState.bandRanges[i];
@@ -983,8 +1072,8 @@ function updateEqBars(timestampMs) {
 			const end = range ? range.end : start + 1;
 			let sum = 0;
 			let max = 0;
-			const count = Math.max(1, end - start);
-			for (let bin = start; bin < end; bin += 1) {
+			const count = Math.max(1, Math.ceil((end - start) / binStep));
+			for (let bin = start; bin < end; bin += binStep) {
 				const value = musicVizState.freqData[bin] / 255;
 				sum += value;
 				if (value > max) max = value;
@@ -1132,7 +1221,14 @@ function updateEqBars(timestampMs) {
 }
 
 function runMusicVisualizer(timestampMs) {
-	updateEqBars(timestampMs);
+	const frameIntervalMs = getEqFrameIntervalMs();
+	const shouldRender =
+		!musicVizState.lastRenderTimeMs ||
+		timestampMs - musicVizState.lastRenderTimeMs >= frameIntervalMs;
+	if (shouldRender) {
+		updateEqBars(timestampMs);
+		musicVizState.lastRenderTimeMs = timestampMs;
+	}
 	musicVizState.rafId = window.requestAnimationFrame(runMusicVisualizer);
 }
 
@@ -1146,10 +1242,10 @@ async function ensureMusicVisualizerReady() {
 	try {
 		const audioContext = new AudioContextClass();
 		const analyser = audioContext.createAnalyser();
-		analyser.fftSize = 4096;
+		analyser.fftSize = getAnalyserFftSize();
 		analyser.minDecibels = -108;
 		analyser.maxDecibels = -12;
-		analyser.smoothingTimeConstant = 0.03;
+		analyser.smoothingTimeConstant = isCompactMobileViewport() ? 0.05 : 0.03;
 		const sourceNode = audioContext.createMediaElementSource(romanticAudio);
 		sourceNode.connect(analyser);
 		analyser.connect(audioContext.destination);
@@ -1243,7 +1339,19 @@ function initUiCompactToggle() {
 }
 
 window.addEventListener("resize", () => {
+	syncMobilePerformanceMode();
 	state.maxActive = getMaxActiveCount();
+	if (musicVizState.analyser) {
+		const targetFftSize = getAnalyserFftSize();
+		if (musicVizState.analyser.fftSize !== targetFftSize) {
+			musicVizState.analyser.fftSize = targetFftSize;
+			musicVizState.freqData = new Uint8Array(
+				musicVizState.analyser.frequencyBinCount,
+			);
+			musicVizState.timeData = new Uint8Array(musicVizState.analyser.fftSize);
+			rebuildEqBandRanges();
+		}
+	}
 	if (eqLane) {
 		const expected = getEqBarCountForViewport();
 		if (musicVizState.bars.length !== expected) {
@@ -1255,6 +1363,7 @@ window.addEventListener("resize", () => {
 });
 
 async function init() {
+	syncMobilePerformanceMode();
 	await loadMediaItems();
 	primeMediaWarmups();
 	startFloatingScene();

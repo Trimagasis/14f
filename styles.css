@@ -107,6 +107,7 @@ textarea {
 	z-index: 2;
 	pointer-events: none;
 	overflow: hidden;
+	contain: layout paint style;
 }
 
 .ui-compact-toggle {
@@ -438,6 +439,7 @@ body.ui-collapsed .eq-bar {
 		0 24px 48px rgba(0, 0, 0, 0.45),
 		0 4px 20px rgba(255, 154, 188, 0.2);
 	will-change: transform, opacity, filter;
+	contain: paint;
 }
 
 .media-float::after {
@@ -483,6 +485,44 @@ body.ui-collapsed .eq-bar {
 	height: 100%;
 	-o-object-fit: cover;
 	object-fit: cover;
+}
+
+body.mobile-optimized .ambient-shape {
+	-webkit-filter: blur(22px);
+	filter: blur(22px);
+	opacity: 0.27;
+	-webkit-animation: none;
+	animation: none;
+}
+
+body.mobile-optimized .media-float {
+	-webkit-box-shadow:
+		0 10px 24px rgba(0, 0, 0, 0.34),
+		0 2px 8px rgba(255, 154, 188, 0.14);
+	box-shadow:
+		0 10px 24px rgba(0, 0, 0, 0.34),
+		0 2px 8px rgba(255, 154, 188, 0.14);
+	will-change: transform, opacity;
+}
+
+body.mobile-optimized .media-float::after {
+	display: none;
+}
+
+body.mobile-optimized .music-player,
+body.mobile-optimized .note-card {
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+}
+
+body.mobile-optimized .music-player {
+	background: rgba(34, 8, 20, 0.78);
+}
+
+body.mobile-optimized .eq-bar {
+	-webkit-transition: none;
+	-o-transition: none;
+	transition: none;
 }
 
 .love-note {
