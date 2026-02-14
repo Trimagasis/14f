@@ -889,14 +889,39 @@ function normalizeCode(value) {
 	return value.trim().replace(/\s+/g, " ").toLowerCase();
 }
 
+function decodeUtf8Bytes(bytes) {
+	if (typeof TextDecoder !== "undefined") {
+		try {
+			return new TextDecoder("utf-8").decode(bytes);
+		} catch {
+			// Fallback below.
+		}
+	}
+
+	try {
+		let percentEncoded = "";
+		for (let i = 0; i < bytes.length; i += 1) {
+			percentEncoded += `%${bytes[i].toString(16).padStart(2, "0")}`;
+		}
+		return decodeURIComponent(percentEncoded);
+	} catch {
+		let latin1 = "";
+		for (let i = 0; i < bytes.length; i += 1) {
+			latin1 += String.fromCharCode(bytes[i]);
+		}
+		return latin1;
+	}
+}
+
 function decodeSecretMessage() {
 	try {
-		const encoded = atob(SECRET_MESSAGE_PAYLOAD);
+		const encoded = atob(SECRET_MESSAGE_PAYLOAD.replace(/\s+/g, ""));
 		const bytes = new Uint8Array(encoded.length);
 		for (let i = 0; i < encoded.length; i += 1) {
 			bytes[i] = encoded.charCodeAt(i) ^ SECRET_MESSAGE_KEY;
 		}
-		return new TextDecoder("utf-8").decode(bytes);
+		const decoded = decodeUtf8Bytes(bytes).trim();
+		return decoded;
 	} catch (error) {
 		console.error("Не удалось расшифровать текст послания:", error);
 		return "";
@@ -906,7 +931,8 @@ function decodeSecretMessage() {
 function ensureSecretMessageText() {
 	if (!secretMainText) return;
 	if (secretMainText.dataset.ready === "1") return;
-	secretMainText.textContent = decodeSecretMessage();
+	const decoded = decodeSecretMessage();
+	secretMainText.textContent = decoded || "Ошибка расшифровки послания.";
 	secretMainText.dataset.ready = "1";
 }
 

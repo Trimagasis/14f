@@ -739,6 +739,7 @@ body.ui-collapsed .love-note .note-card {
 	margin: 0;
 	font-size: clamp(15px, 1.5vw, 20px);
 	line-height: 1.5;
+	white-space: pre-line;
 }
 
 .secret-signature {
