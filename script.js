@@ -27,7 +27,13 @@ const IMAGE_PRELOAD_CONCURRENCY = 1;
 const VIDEO_PRELOAD_AHEAD = 2;
 const VIDEO_PRELOAD_CONCURRENCY = 1;
 const VIDEO_METADATA_TIMEOUT_MS = 2400;
-const SECRET_CODE = "помню в саратове";
+const SECRET_CODE_SHA256_HEX = [
+	"85ba8f79b0db026d",
+	"7cef6eb4d10ed0e3",
+	"f302bb028142e4a7",
+	"bfd6a95e6718c55e",
+].join("");
+const SECRET_CODE_FNV1A_HEX = "2e689cdb";
 const SECRET_MESSAGE_KEY = 91;
 const SECRET_MESSAGE_PAYLOAD =
 	"i8SL5Yvni+aK1XuL6XuL+ovrituL64rZi+WL6Yvue4vpituL5Yvvi+57itmL64vhi+uK1HuK2YrYi+SL64rUe4rfituL64vsi+t3e4vmi+V7i+SL5Yrci+6L54rYdorZi+V7i+aL64rae4rae4vmi+6L7nuK2Yvli+iL74vre4rZi+uL4XuL5IvlituL6Yvri+CL5Xd7ityK2Yvle4vli+aL63uK2orZi+uL4Ivre4vmi+uK04vji+d7eYvki+uK24vli+CL7ovneXuL6XuL5ovrityL64vgi+57itqL4IrYi+2L6orQdVFRi/R7itmL7ovqitR7i+CK1Yvqi+CK1Xp7i8SK24vri+mL74vrdovkituL64vpi++L63p7i/qL44vgiteL5ovldorai+OL4IrXi+aL5Xp7i/mK0HuK2HuL54vui+aK1HuK2ovri+eL64rUe4vgitiK3IrTi+uK1HuL43uK2ovri+eL64rUe4vhituL64rai+OL6YvritR7YXJRUYv5itiK2XuK1HuK2ovli+qK24vri+B7i+GK2Ircith7ituL64vsi+aK0Iree4vni+WL54vui+aK2Yvli+l7c4vkituL44rUitmL5orQit57i+N7i+mK2orbi+uK2YrQit5ye4rae4vmi+uK04vui+J7i+OK2orZi+WK24vji+N1e4vFityL7ovmitd7i+CK1Yvqi+CK1XuK2Yvui+qK1Hd7itqL5IvritqL44vqi+V7ityK2Yvle4rZitB7i+6K2orZitd7YXJRUYvHi+WL7YvuitOK13uK2ovhituK0IrZitd7i+OL5orZi+6K24rfi+6L4orae4vmi+t7i+GL5ovli+SL4YrYe4vpe4vkituL64vpi+WL53uL6YvuituK3ovmi+6L53uK2Ivoi+CK2HuL43uL5ovritqL4Ivri++L44rZiteK2orUe4rai+CL64vii++K04vlith7YXI=";
@@ -905,6 +911,39 @@ function normalizeCode(value) {
 	return value.trim().replace(/\s+/g, " ").toLowerCase();
 }
 
+function fnv1aHex(value) {
+	let hash = 0x811c9dc5;
+	for (let i = 0; i < value.length; i += 1) {
+		hash ^= value.charCodeAt(i);
+		hash = Math.imul(hash, 0x01000193);
+	}
+	return (hash >>> 0).toString(16).padStart(8, "0");
+}
+
+async function sha256Hex(value) {
+	if (!window.crypto?.subtle || typeof TextEncoder === "undefined") return null;
+	try {
+		const encoded = new TextEncoder().encode(value);
+		const digest = await window.crypto.subtle.digest("SHA-256", encoded);
+		const bytes = new Uint8Array(digest);
+		let hex = "";
+		for (let i = 0; i < bytes.length; i += 1) {
+			hex += bytes[i].toString(16).padStart(2, "0");
+		}
+		return hex;
+	} catch (error) {
+		console.error("Не удалось вычислить SHA-256:", error);
+		return null;
+	}
+}
+
+async function isSecretCodeValid(normalizedCode) {
+	const shaHex = await sha256Hex(normalizedCode);
+	if (shaHex) return shaHex === SECRET_CODE_SHA256_HEX;
+	// Fallback for old/limited environments.
+	return fnv1aHex(normalizedCode) === SECRET_CODE_FNV1A_HEX;
+}
+
 function updateNoteScrollHint() {
 	if (!noteCard) return;
 	const canScroll = noteCard.scrollHeight - noteCard.clientHeight > 28;
@@ -1013,24 +1052,30 @@ function shouldAutoFocusSecretCode() {
 	return !coarsePointer && !isIOS;
 }
 
-function handleSecretCodeSubmit() {
+async function handleSecretCodeSubmit() {
 	if (!secretCodeInput || !secretCodeError || !secretMessage) return;
+	if (secretCodeSubmit) secretCodeSubmit.disabled = true;
 	const entered = normalizeCode(secretCodeInput.value);
-	if (entered === SECRET_CODE) {
+	const valid = await isSecretCodeValid(entered);
+	if (valid) {
 		secretCodeError.hidden = true;
 		openSecretMessage();
+		if (secretCodeSubmit) secretCodeSubmit.disabled = false;
 		return;
 	}
 	secretCodeError.hidden = false;
+	if (secretCodeSubmit) secretCodeSubmit.disabled = false;
 }
 
 function initSecretCodeUnlock() {
 	if (!secretCodeInput || !secretCodeSubmit) return;
-	secretCodeSubmit.addEventListener("click", handleSecretCodeSubmit);
+	secretCodeSubmit.addEventListener("click", () => {
+		void handleSecretCodeSubmit();
+	});
 	secretCodeInput.addEventListener("keydown", (event) => {
 		if (event.key === "Enter") {
 			event.preventDefault();
-			handleSecretCodeSubmit();
+			void handleSecretCodeSubmit();
 		}
 	});
 	secretCodeInput.addEventListener("input", () => {
