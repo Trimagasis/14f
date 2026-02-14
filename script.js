@@ -8,6 +8,7 @@ const secretCodeSubmit = document.getElementById("secret-code-submit");
 const secretCodeError = document.getElementById("secret-code-error");
 const secretMessage = document.getElementById("secret-message");
 const secretMainText = document.getElementById("secret-main-text");
+const noteCard = document.getElementById("note-card");
 const musicPlayer = document.getElementById("music-player");
 const musicToggle = document.getElementById("music-toggle");
 const eqLane = document.getElementById("eq-lane");
@@ -79,7 +80,8 @@ function isCompactMobileViewport() {
 }
 
 function isMobileLowPowerDevice() {
-	const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
+	const coarsePointer =
+		window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
 	const lowMemory =
 		typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 4;
 	const lowCpu =
@@ -238,7 +240,8 @@ function getWebpCandidateUrl(url) {
 function warmupImageWithPreferredFormat(originalUrl) {
 	return new Promise((resolve) => {
 		const webpCandidate = getWebpCandidateUrl(originalUrl);
-		const primaryUrl = webpCandidate !== originalUrl ? webpCandidate : originalUrl;
+		const primaryUrl =
+			webpCandidate !== originalUrl ? webpCandidate : originalUrl;
 		const probeImage = new Image();
 		probeImage.decoding = "async";
 
@@ -312,7 +315,10 @@ function warmupVideoMetadata(url) {
 			resolve(ready);
 		};
 
-		const timeoutId = window.setTimeout(() => finalize(false), VIDEO_METADATA_TIMEOUT_MS);
+		const timeoutId = window.setTimeout(
+			() => finalize(false),
+			VIDEO_METADATA_TIMEOUT_MS,
+		);
 		video.preload = "metadata";
 		video.muted = true;
 		video.playsInline = true;
@@ -365,7 +371,10 @@ function warmupSomeImages(targetCount) {
 		const status = state.imageWarmStatus.get(item.url);
 		return status !== "ready" && status !== "loading" && status !== "failed";
 	});
-	const toWarm = pickRandomUniqueEntries(candidates, Math.min(targetCount, candidates.length));
+	const toWarm = pickRandomUniqueEntries(
+		candidates,
+		Math.min(targetCount, candidates.length),
+	);
 	for (const item of toWarm) {
 		enqueueImageWarmup(item.url);
 	}
@@ -376,7 +385,10 @@ function warmupSomeVideos(targetCount) {
 		const status = state.videoWarmStatus.get(item.url);
 		return status !== "ready" && status !== "loading" && status !== "failed";
 	});
-	const toWarm = pickRandomUniqueEntries(candidates, Math.min(targetCount, candidates.length));
+	const toWarm = pickRandomUniqueEntries(
+		candidates,
+		Math.min(targetCount, candidates.length),
+	);
 	for (const item of toWarm) {
 		enqueueVideoWarmup(item.url);
 	}
@@ -889,6 +901,26 @@ function normalizeCode(value) {
 	return value.trim().replace(/\s+/g, " ").toLowerCase();
 }
 
+function updateNoteScrollHint() {
+	if (!noteCard) return;
+	const canScroll = noteCard.scrollHeight - noteCard.clientHeight > 28;
+	const atBottom =
+		noteCard.scrollTop + noteCard.clientHeight >= noteCard.scrollHeight - 8;
+	noteCard.classList.toggle("show-scroll-hint", canScroll && !atBottom);
+}
+
+function scheduleNoteScrollHintUpdate() {
+	window.requestAnimationFrame(() => {
+		window.requestAnimationFrame(updateNoteScrollHint);
+	});
+}
+
+function initNoteScrollHint() {
+	if (!noteCard) return;
+	noteCard.addEventListener("scroll", updateNoteScrollHint, { passive: true });
+	scheduleNoteScrollHintUpdate();
+}
+
 function decodeUtf8Bytes(bytes) {
 	if (typeof TextDecoder !== "undefined") {
 		try {
@@ -944,6 +976,7 @@ function openSecretMessage() {
 	// Force reflow so animation can replay when needed.
 	void secretMessage.offsetWidth;
 	secretMessage.classList.add("is-open");
+	scheduleNoteScrollHintUpdate();
 }
 
 function openSecretPanel() {
@@ -953,6 +986,7 @@ function openSecretPanel() {
 	// Force reflow so animation can replay.
 	void secretPanel.offsetWidth;
 	secretPanel.classList.add("is-open");
+	scheduleNoteScrollHintUpdate();
 
 	if (openMessageMenu) {
 		openMessageMenu.hidden = true;
@@ -967,7 +1001,8 @@ function openSecretPanel() {
 }
 
 function shouldAutoFocusSecretCode() {
-	const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
+	const coarsePointer =
+		window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
 	const isIOS =
 		/iPad|iPhone|iPod/.test(navigator.userAgent) ||
 		(navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -1069,7 +1104,9 @@ function rebuildEqBars(count) {
 	musicVizState.smoothedLevels = new Array(musicVizState.bars.length).fill(
 		EQ_MIN_LEVEL,
 	);
-	musicVizState.previousBandLevels = new Array(musicVizState.bars.length).fill(0);
+	musicVizState.previousBandLevels = new Array(musicVizState.bars.length).fill(
+		0,
+	);
 	musicVizState.bandFloorLevels = new Array(musicVizState.bars.length).fill(0);
 	musicVizState.bandPeakLevels = new Array(musicVizState.bars.length).fill(0);
 	musicVizState.lastRenderTimeMs = 0;
@@ -1081,9 +1118,9 @@ function updateEqBars(timestampMs) {
 
 	const isPlaying = Boolean(
 		romanticAudio &&
-			!romanticAudio.paused &&
-			!romanticAudio.ended &&
-			romanticAudio.readyState > 1,
+		!romanticAudio.paused &&
+		!romanticAudio.ended &&
+		romanticAudio.readyState > 1,
 	);
 	const isUiCollapsed = document.body.classList.contains("ui-collapsed");
 	const opacityMultiplier = 1;
@@ -1161,20 +1198,25 @@ function updateEqBars(timestampMs) {
 			Math.floor(bandCount * 0.24),
 			Math.floor(bandCount * 0.64),
 		);
-		const highEnergy = averageRange(rawBands, Math.floor(bandCount * 0.64), bandCount);
+		const highEnergy = averageRange(
+			rawBands,
+			Math.floor(bandCount * 0.64),
+			bandCount,
+		);
 
 		for (let i = 0; i < bandCount; i += 1) {
 			const bar = musicVizState.bars[i];
 			const raw = rawBands[i];
 			const gate = Math.max(0, raw - musicVizState.energyCeil * 0.27);
-			const previousFloor =
-				musicVizState.bandFloorLevels[i] ?? gate * 0.4;
+			const previousFloor = musicVizState.bandFloorLevels[i] ?? gate * 0.4;
 			const bandFloor =
 				gate < previousFloor
 					? previousFloor * (1 - EQ_BAND_FLOOR_FALL) + gate * EQ_BAND_FLOOR_FALL
-					: previousFloor * (1 - EQ_BAND_FLOOR_RISE) + gate * EQ_BAND_FLOOR_RISE;
+					: previousFloor * (1 - EQ_BAND_FLOOR_RISE) +
+						gate * EQ_BAND_FLOOR_RISE;
 			const previousPeak =
-				musicVizState.bandPeakLevels[i] ?? Math.max(bandFloor + EQ_BAND_MIN_RANGE, gate);
+				musicVizState.bandPeakLevels[i] ??
+				Math.max(bandFloor + EQ_BAND_MIN_RANGE, gate);
 			const bandPeak = Math.max(
 				gate,
 				previousPeak * EQ_BAND_PEAK_DECAY,
@@ -1202,10 +1244,7 @@ function updateEqBars(timestampMs) {
 				midEnergy * midWeight * 0.36 +
 				highEnergy * highWeight * 0.58;
 			const frameRelative = Math.min(1, raw / frameMaxRaw);
-			const normalized = Math.min(
-				1,
-				bandNormalized * autoGain * toneFactor,
-			);
+			const normalized = Math.min(1, bandNormalized * autoGain * toneFactor);
 			const shaped = Math.pow(normalized, 1.12);
 			let targetLevel =
 				EQ_MIN_LEVEL +
@@ -1215,12 +1254,8 @@ function updateEqBars(timestampMs) {
 
 			// Real-EQ cap: weak bands cannot jump to full height.
 			const maxAllowed =
-				EQ_MAX_LEVEL *
-				(0.2 + Math.pow(frameRelative, 1.85) * 0.8);
-			targetLevel = Math.min(
-				targetLevel,
-				Math.max(EQ_MIN_LEVEL, maxAllowed),
-			);
+				EQ_MAX_LEVEL * (0.2 + Math.pow(frameRelative, 1.85) * 0.8);
+			targetLevel = Math.min(targetLevel, Math.max(EQ_MIN_LEVEL, maxAllowed));
 
 			// Early soft ceiling: prevents long "fully-filled" plateaus.
 			if (targetLevel > EQ_MAX_LEVEL * EQ_TOP_SOFT_START) {
@@ -1255,8 +1290,7 @@ function updateEqBars(timestampMs) {
 	for (let i = 0; i < musicVizState.bars.length; i += 1) {
 		const bar = musicVizState.bars[i];
 		const idleFlicker = isUiCollapsed
-			? 0.014 +
-				((Math.sin(timestampMs * 0.006 + i * 0.9) + 1) / 2) * 0.08
+			? 0.014 + ((Math.sin(timestampMs * 0.006 + i * 0.9) + 1) / 2) * 0.08
 			: 0;
 		const targetLevel = EQ_MIN_LEVEL + idleFlicker;
 		const prev = musicVizState.smoothedLevels[i] ?? EQ_MIN_LEVEL;
@@ -1269,10 +1303,7 @@ function updateEqBars(timestampMs) {
 		bar.style.backgroundColor = isUiCollapsed ? "rgba(255, 255, 255, 1)" : "";
 		bar.style.opacity = isUiCollapsed
 			? "0.92"
-			: `${Math.min(
-					0.44,
-					(0.1 + next * 0.34) * opacityMultiplier,
-				).toFixed(3)}`;
+			: `${Math.min(0.44, (0.1 + next * 0.34) * opacityMultiplier).toFixed(3)}`;
 	}
 }
 
@@ -1397,6 +1428,7 @@ function initUiCompactToggle() {
 window.addEventListener("resize", () => {
 	syncMobilePerformanceMode();
 	state.maxActive = getMaxActiveCount();
+	scheduleNoteScrollHintUpdate();
 	if (musicVizState.analyser) {
 		const targetFftSize = getAnalyserFftSize();
 		if (musicVizState.analyser.fftSize !== targetFftSize) {
@@ -1427,6 +1459,7 @@ async function init() {
 	initMusicPlayer();
 	initMessageMenuButton();
 	initSecretCodeUnlock();
+	initNoteScrollHint();
 }
 
 init();

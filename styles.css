@@ -422,7 +422,7 @@ body.ui-collapsed .eq-lane {
 }
 
 body.ui-collapsed .eq-lane::before {
-	background: rgba(255, 255, 255, 0.45) !important;
+	background: rgba(255, 255, 255, 0.15) !important;
 	opacity: 1;
 }
 
@@ -573,6 +573,7 @@ body.ui-collapsed .love-note .note-card {
 }
 
 .note-card {
+	position: relative;
 	margin-bottom: 70px;
 	width: min(760px, calc(100vw - 32px));
 	padding: clamp(20px, 3.4vw, 34px);
@@ -811,6 +812,34 @@ body.ui-collapsed .love-note .note-card {
 	}
 }
 
+@-webkit-keyframes scrollHintPulse {
+	0%,
+	100% {
+		opacity: 0.34;
+		-webkit-transform: translateX(-50%) translateY(-2px) rotate(45deg);
+		transform: translateX(-50%) translateY(-2px) rotate(45deg);
+	}
+	50% {
+		opacity: 0.95;
+		-webkit-transform: translateX(-50%) translateY(2px) rotate(45deg);
+		transform: translateX(-50%) translateY(2px) rotate(45deg);
+	}
+}
+
+@keyframes scrollHintPulse {
+	0%,
+	100% {
+		opacity: 0.34;
+		-webkit-transform: translateX(-50%) translateY(-2px) rotate(45deg);
+		transform: translateX(-50%) translateY(-2px) rotate(45deg);
+	}
+	50% {
+		opacity: 0.95;
+		-webkit-transform: translateX(-50%) translateY(2px) rotate(45deg);
+		transform: translateX(-50%) translateY(2px) rotate(45deg);
+	}
+}
+
 @media (max-width: 700px) {
 	.music-player {
 		gap: 12px;
@@ -903,6 +932,39 @@ body.ui-collapsed .love-note .note-card {
 		overscroll-behavior: contain;
 		-webkit-overflow-scrolling: touch;
 		touch-action: pan-y;
+	}
+
+	.note-card.show-scroll-hint::after {
+		content: "";
+		position: absolute;
+		left: 10px;
+		right: 10px;
+		bottom: 8px;
+		height: 28px;
+		border-radius: 0 0 12px 12px;
+		background: linear-gradient(
+			180deg,
+			rgba(35, 9, 20, 0),
+			rgba(35, 9, 20, 0.72)
+		);
+		pointer-events: none;
+	}
+
+	.note-card.show-scroll-hint::before {
+		content: "";
+		position: absolute;
+		left: 50%;
+		bottom: 16px;
+		width: 10px;
+		height: 10px;
+		border-right: 2px solid rgba(255, 214, 228, 0.78);
+		border-bottom: 2px solid rgba(255, 214, 228, 0.78);
+		-webkit-transform: translateX(-50%) rotate(45deg);
+		-ms-transform: translateX(-50%) rotate(45deg);
+		transform: translateX(-50%) rotate(45deg);
+		-webkit-animation: scrollHintPulse 1.25s ease-in-out infinite;
+		animation: scrollHintPulse 1.25s ease-in-out infinite;
+		pointer-events: none;
 	}
 
 	.music-player {
