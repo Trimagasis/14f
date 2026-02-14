@@ -51,19 +51,49 @@
 					</div>
 
 					<p id="secret-code-error" class="secret-error" hidden>
-						Неверный код. Вспомни Саратов :)
+						Неверный код. Подсказка: Саратов :)
 					</p>
 
 					<div id="secret-message" class="secret-message" hidden>
 						<p class="secret-main-text">
+							Помню в Саратове вроде такая тупая фраза, но почему-то нас с нее
+							тогда так порвало, что она стала нашим "паролем" в начале службы.
+							<br />
 							Я тебя люблю! Правда-правда! Сильно-сильно! Ты у меня самая лучшая
-							и самая красивая :) <br /><br /><br />
+							и самая красивая :) <br />
+							Тут я собрал кучу разных моментов (приятных и всратых) с нашей
+							истории. Очень люблю тебя, спасибо что ты есть :)
+							<br /><br />
 							Можешь скрыть интерфейс на кнопку в правом верхнем углу и
 							насладиться слайдшоу :)
 						</p>
 					</div>
 				</div>
 			</div>
+		</section>
+
+		<section
+			class="music-player"
+			id="music-player"
+			aria-label="Музыкальный плеер"
+		>
+			<button
+				id="music-toggle"
+				class="music-toggle"
+				type="button"
+				aria-label="Плей"
+				title="Плей"
+			>
+				<span class="music-icon" aria-hidden="true"></span>
+				<span class="sr-only music-toggle-label">Плей</span>
+			</button>
+			<div id="eq-lane" class="eq-lane" aria-hidden="true"></div>
+			<audio
+				id="romantic-audio"
+				src="./music/Noize_MC_Vselennaya_beskonechna_.mp3"
+				preload="auto"
+				loop
+			></audio>
 		</section>
 
 		<script src="./script.js"></script>
