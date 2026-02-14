@@ -18,6 +18,11 @@ body {
 	margin: 0;
 }
 
+html,
+body {
+	overscroll-behavior: none;
+}
+
 body {
 	overflow: hidden;
 	position: relative;
@@ -845,12 +850,63 @@ body.ui-collapsed .love-note .note-card {
 }
 
 @media (max-width: 430px) {
+	html,
+	body {
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+	}
+
+	body {
+		position: fixed;
+		inset: 0;
+		min-height: 100svh;
+		height: 100svh;
+		max-height: 100svh;
+	}
+
+	.ambient,
+	.stage,
+	.love-note {
+		width: 100%;
+		height: 100%;
+	}
+
 	.eq-lane {
 		--eq-lane-pad-y: 6px;
 		--eq-bar-gap: 1px;
 		width: clamp(210px, 62vw, 280px);
 		height: 78px;
 		padding-inline: 8px;
+	}
+
+	.love-note {
+		padding: 10px 10px 118px;
+		-webkit-box-align: center;
+		-ms-flex-align: center;
+		align-items: center;
+		justify-items: center;
+		overflow: hidden;
+	}
+
+	.note-card {
+		margin-bottom: 0;
+		width: min(calc(100% - 20px), calc(100vw - 20px));
+		max-width: calc(100% - 20px);
+		max-height: calc(100svh - 188px);
+		min-height: 0;
+		padding: 12px 10px;
+		border-radius: 14px;
+		overflow-y: auto;
+		-ms-scroll-chaining: none;
+		overscroll-behavior: contain;
+		-webkit-overflow-scrolling: touch;
+		touch-action: pan-y;
+	}
+
+	.music-player {
+		width: min(calc(100% - 14px), 360px);
+		max-width: calc(100% - 14px);
 	}
 }
 

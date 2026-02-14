@@ -7,6 +7,7 @@ const secretCodeInput = document.getElementById("secret-code-input");
 const secretCodeSubmit = document.getElementById("secret-code-submit");
 const secretCodeError = document.getElementById("secret-code-error");
 const secretMessage = document.getElementById("secret-message");
+const secretMainText = document.getElementById("secret-main-text");
 const musicPlayer = document.getElementById("music-player");
 const musicToggle = document.getElementById("music-toggle");
 const eqLane = document.getElementById("eq-lane");
@@ -26,6 +27,9 @@ const VIDEO_PRELOAD_AHEAD = 2;
 const VIDEO_PRELOAD_CONCURRENCY = 1;
 const VIDEO_METADATA_TIMEOUT_MS = 2400;
 const SECRET_CODE = "помню в саратове";
+const SECRET_MESSAGE_KEY = 91;
+const SECRET_MESSAGE_PAYLOAD =
+	"i8SL5Yvni+aK1XuL6XuL+ovrituL64rZi+WL6Yvue4vpituL5Yvvi+57itmL64vhi+uK1HuK2YrYi+SL64rUe4rfituL64vsi+t3e4vmi+V7i+SL5Yrci+6L54rYdorZi+V7i+aL64rae4rae4vmi+6L7nuK2Yvli+iL74vre4rZi+uL4XuL5IvlituL6Yvri+CL5Xd7ityK2Yvle4vli+aL63uK2orZi+uL4Ivre4vmi+uK04vji+d7eYvki+uK24vli+CL7ovneXuL6XuL5ovrityL64vgi+57itqL4IrYi+2L6orQdVFRi/R7itmL7ovqitR7i+CK1Yvqi+CK1Xp7i8SK24vri+mL74vrdovkituL64vpi++L63p7i/qL44vgiteL5ovldorai+OL4IrXi+aL5Xp7i/mK0HuK2HuL54vui+aK1HuK2ovri+eL64rUe4vgitiK3IrTi+uK1HuL43uK2ovri+eL64rUe4vhituL64rai+OL6YvritR7YXJRUYv5itiK2XuK1HuK2ovli+qK24vri+B7i+GK2Ircith7ituL64vsi+aK0Iree4vni+WL54vui+aK2Yvli+l7c4vkituL44rUitmL5orQit57i+N7i+mK2orbi+uK2YrQit5ye4rae4vmi+uK04vui+J7i+OK2orZi+WK24vji+N1e4vFityL7ovmitd7i+CK1Yvqi+CK1XuK2Yvui+qK1Hd7itqL5IvritqL44vqi+V7ityK2Yvle4rZitB7i+6K2orZitd7YXJRUYvHi+WL7YvuitOK13uK2ovhituK0IrZitd7i+OL5orZi+6K24rfi+6L4orae4vmi+t7i+GL5ovli+SL4YrYe4vpe4vkituL64vpi+WL53uL6YvuituK3ovmi+6L53uK2Ivoi+CK2HuL43uL5ovritqL4Ivri++L44rZiteK2orUe4rai+CL64vii++K04vlith7YXI=";
 const EQ_BAR_COUNT_DESKTOP = 148;
 const EQ_MIN_LEVEL = 0.001;
 const EQ_MAX_LEVEL = 1.3;
@@ -85,7 +89,7 @@ function isMobileLowPowerDevice() {
 }
 
 function getMaxActiveCount() {
-	if (isPhoneViewport()) return isMobileLowPowerDevice() ? 3 : 4;
+	if (isPhoneViewport()) return isMobileLowPowerDevice() ? 6 : 7;
 	if (window.innerWidth < 800) return isMobileLowPowerDevice() ? 6 : 8;
 	return 14;
 }
@@ -104,7 +108,9 @@ function getVideoProbability() {
 }
 
 function getSpawnDelayRange() {
-	if (isPhoneViewport()) return { min: 2200, max: 4200 };
+	if (isPhoneViewport()) {
+		return { min: SPAWN_DELAY_MIN_MS, max: SPAWN_DELAY_MAX_MS };
+	}
 	if (isCompactMobileViewport()) return { min: 1750, max: 3400 };
 	return { min: SPAWN_DELAY_MIN_MS, max: SPAWN_DELAY_MAX_MS };
 }
@@ -491,6 +497,10 @@ function createMediaNode(item) {
 		video.autoplay = true;
 		video.playsInline = true;
 		video.preload = "metadata";
+		video.setAttribute("playsinline", "");
+		video.setAttribute("webkit-playsinline", "");
+		video.disablePictureInPicture = true;
+		video.controls = false;
 		return video;
 	}
 
@@ -540,7 +550,7 @@ function buildFloatElement(item) {
 
 	const size = Math.round(
 		phone
-			? randomBetween(178, 274)
+			? randomBetween(214, 329)
 			: compact
 				? randomBetween(300, 470)
 				: randomBetween(620, 780),
@@ -858,9 +868,7 @@ function spawnFloatingItem() {
 }
 
 function startFloatingScene() {
-	const initialSpawnCount = isPhoneViewport()
-		? Math.min(2, state.maxActive)
-		: Math.min(3, state.maxActive);
+	const initialSpawnCount = Math.min(3, state.maxActive);
 	for (let i = 0; i < initialSpawnCount; i += 1) {
 		setTimeout(spawnFloatingItem, i * randomInt(260, 420));
 	}
@@ -881,8 +889,30 @@ function normalizeCode(value) {
 	return value.trim().replace(/\s+/g, " ").toLowerCase();
 }
 
+function decodeSecretMessage() {
+	try {
+		const encoded = atob(SECRET_MESSAGE_PAYLOAD);
+		const bytes = new Uint8Array(encoded.length);
+		for (let i = 0; i < encoded.length; i += 1) {
+			bytes[i] = encoded.charCodeAt(i) ^ SECRET_MESSAGE_KEY;
+		}
+		return new TextDecoder("utf-8").decode(bytes);
+	} catch (error) {
+		console.error("Не удалось расшифровать текст послания:", error);
+		return "";
+	}
+}
+
+function ensureSecretMessageText() {
+	if (!secretMainText) return;
+	if (secretMainText.dataset.ready === "1") return;
+	secretMainText.textContent = decodeSecretMessage();
+	secretMainText.dataset.ready = "1";
+}
+
 function openSecretMessage() {
 	if (!secretMessage) return;
+	ensureSecretMessageText();
 	secretMessage.hidden = false;
 	secretMessage.classList.remove("is-open");
 	// Force reflow so animation can replay when needed.
