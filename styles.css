@@ -526,9 +526,22 @@ body.mobile-optimized .music-player {
 }
 
 body.mobile-optimized .eq-bar {
-	-webkit-transition: none;
-	-o-transition: none;
-	transition: none;
+	-webkit-transition:
+		opacity 42ms linear,
+		-webkit-transform 26ms linear;
+	transition:
+		opacity 42ms linear,
+		-webkit-transform 26ms linear;
+	-o-transition:
+		transform 26ms linear,
+		opacity 42ms linear;
+	transition:
+		transform 26ms linear,
+		opacity 42ms linear;
+	transition:
+		transform 26ms linear,
+		opacity 42ms linear,
+		-webkit-transform 26ms linear;
 }
 
 .love-note {

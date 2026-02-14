@@ -31,23 +31,27 @@ const SECRET_CODE = "помню в саратове";
 const SECRET_MESSAGE_KEY = 91;
 const SECRET_MESSAGE_PAYLOAD =
 	"i8SL5Yvni+aK1XuL6XuL+ovrituL64rZi+WL6Yvue4vpituL5Yvvi+57itmL64vhi+uK1HuK2YrYi+SL64rUe4rfituL64vsi+t3e4vmi+V7i+SL5Yrci+6L54rYdorZi+V7i+aL64rae4rae4vmi+6L7nuK2Yvli+iL74vre4rZi+uL4XuL5IvlituL6Yvri+CL5Xd7ityK2Yvle4vli+aL63uK2orZi+uL4Ivre4vmi+uK04vji+d7eYvki+uK24vli+CL7ovneXuL6XuL5ovrityL64vgi+57itqL4IrYi+2L6orQdVFRi/R7itmL7ovqitR7i+CK1Yvqi+CK1Xp7i8SK24vri+mL74vrdovkituL64vpi++L63p7i/qL44vgiteL5ovldorai+OL4IrXi+aL5Xp7i/mK0HuK2HuL54vui+aK1HuK2ovri+eL64rUe4vgitiK3IrTi+uK1HuL43uK2ovri+eL64rUe4vhituL64rai+OL6YvritR7YXJRUYv5itiK2XuK1HuK2ovli+qK24vri+B7i+GK2Ircith7ituL64vsi+aK0Iree4vni+WL54vui+aK2Yvli+l7c4vkituL44rUitmL5orQit57i+N7i+mK2orbi+uK2YrQit5ye4rae4vmi+uK04vui+J7i+OK2orZi+WK24vji+N1e4vFityL7ovmitd7i+CK1Yvqi+CK1XuK2Yvui+qK1Hd7itqL5IvritqL44vqi+V7ityK2Yvle4rZitB7i+6K2orZitd7YXJRUYvHi+WL7YvuitOK13uK2ovhituK0IrZitd7i+OL5orZi+6K24rfi+6L4orae4vmi+t7i+GL5ovli+SL4YrYe4vpe4vkituL64vpi+WL53uL6YvuituK3ovmi+6L53uK2Ivoi+CK2HuL43uL5ovritqL4Ivri++L44rZiteK2orUe4rai+CL64vii++K04vlith7YXI=";
-const EQ_BAR_COUNT_DESKTOP = 300;
-const EQ_MIN_LEVEL = 0.001;
-const EQ_MAX_LEVEL = 1.3;
+const EQ_BAR_COUNT_DESKTOP = 165;
+const EQ_MIN_LEVEL = 0.0001;
+const EQ_MAX_LEVEL = 1.82;
 const EQ_AGC_FLOOR = 0.11;
 const EQ_AGC_DECAY = 0.986;
-const EQ_AGC_TARGET = 0.24;
-const EQ_AUTO_GAIN_MAX = 1.9;
-const EQ_ATTACK = 0.9;
+const EQ_AGC_TARGET = 0.27;
+const EQ_AUTO_GAIN_MAX = 1.78;
+const EQ_ATTACK = 0.84;
 const EQ_FLUX_BOOST = 2.15;
-const EQ_TOP_SOFT_START = 0.78;
-const EQ_ROLLBACK_SEC = 0.2;
+const EQ_TOP_SOFT_START = 0.81;
+const EQ_ROLLBACK_SEC = 0.12;
 const EQ_LOW_TRIM = 0.6;
 const EQ_HIGH_TILT = 1.55;
-const EQ_BAND_FLOOR_RISE = 0.004;
-const EQ_BAND_FLOOR_FALL = 0.32;
+const EQ_BAND_FLOOR_RISE = 0.028;
+const EQ_BAND_FLOOR_FALL = 0.26;
 const EQ_BAND_PEAK_DECAY = 0.978;
-const EQ_BAND_MIN_RANGE = 0.08;
+const EQ_BAND_MIN_RANGE = 0.1;
+const EQ_FRAME_CAP_BASE = 0.05;
+const EQ_FRAME_CAP_POWER = 2.25;
+const EQ_SOFT_CEIL_MIX = 0.12;
+const EQ_SHAPE_POWER = 1.28;
 const EQ_FPS_PHONE = 30;
 const EQ_FPS_MOBILE = 40;
 const EQ_FPS_DESKTOP = 60;
@@ -1203,11 +1207,25 @@ function updateEqBars(timestampMs) {
 			Math.floor(bandCount * 0.64),
 			bandCount,
 		);
+		const beatPulse = Math.max(
+			0,
+			Math.min(1, lowEnergy * 1.8 + midEnergy * 0.7 + rms * 3.2 - 0.26),
+		);
+		const loudnessIndex = Math.max(
+			0,
+			Math.min(1, frameEnergy * 2.2 + rms * 2.4 - 0.05),
+		);
+		const introFactor = romanticAudio
+			? Math.max(0.45, Math.min(1, romanticAudio.currentTime / 7))
+			: 1;
+		const quietGuard = 0.28 + loudnessIndex * 0.72;
 
 		for (let i = 0; i < bandCount; i += 1) {
 			const bar = musicVizState.bars[i];
 			const raw = rawBands[i];
-			const gate = Math.max(0, raw - musicVizState.energyCeil * 0.27);
+			const dynamicGate =
+				musicVizState.energyCeil * (0.3 + (1 - loudnessIndex) * 0.18);
+			const gate = Math.max(0, raw - dynamicGate);
 			const previousFloor = musicVizState.bandFloorLevels[i] ?? gate * 0.4;
 			const bandFloor =
 				gate < previousFloor
@@ -1245,33 +1263,51 @@ function updateEqBars(timestampMs) {
 				highEnergy * highWeight * 0.58;
 			const frameRelative = Math.min(1, raw / frameMaxRaw);
 			const normalized = Math.min(1, bandNormalized * autoGain * toneFactor);
-			const shaped = Math.pow(normalized, 1.12);
+			const shaped = Math.pow(Math.max(0, normalized - 0.03), EQ_SHAPE_POWER);
+			const frameSpread = Math.pow(frameRelative, 1.5);
+			const transient = Math.pow(Math.max(0, spectralFlux), 0.78);
 			let targetLevel =
 				EQ_MIN_LEVEL +
-				shaped * 1.18 +
-				spectralFlux * (EQ_FLUX_BOOST * 0.42) +
-				rms * 0.006;
+				shaped * 1.3 +
+				frameSpread * 0.24 +
+				transient * (EQ_FLUX_BOOST * 0.38) +
+				beatPulse * (0.08 + lowWeight * 0.12 + midWeight * 0.06) +
+				rms * 0.009;
+			targetLevel *= quietGuard * introFactor;
 
 			// Real-EQ cap: weak bands cannot jump to full height.
 			const maxAllowed =
-				EQ_MAX_LEVEL * (0.2 + Math.pow(frameRelative, 1.85) * 0.8);
+				EQ_MAX_LEVEL *
+				(EQ_FRAME_CAP_BASE +
+					Math.pow(frameRelative, EQ_FRAME_CAP_POWER) *
+						(1 - EQ_FRAME_CAP_BASE));
 			targetLevel = Math.min(targetLevel, Math.max(EQ_MIN_LEVEL, maxAllowed));
+			const transientHeadroom = Math.min(
+				1,
+				0.28 + loudnessIndex * 0.36 + frameSpread * 0.1 + transient * 0.35,
+			);
+			const globalCap = EQ_MAX_LEVEL * transientHeadroom * introFactor;
+			targetLevel = Math.min(targetLevel, Math.max(EQ_MIN_LEVEL, globalCap));
 
 			// Early soft ceiling: prevents long "fully-filled" plateaus.
 			if (targetLevel > EQ_MAX_LEVEL * EQ_TOP_SOFT_START) {
 				const over = targetLevel - EQ_MAX_LEVEL * EQ_TOP_SOFT_START;
-				targetLevel = EQ_MAX_LEVEL * EQ_TOP_SOFT_START + over * 0.08;
+				targetLevel =
+					EQ_MAX_LEVEL * EQ_TOP_SOFT_START + over * EQ_SOFT_CEIL_MIX;
 			}
 			targetLevel = Math.max(EQ_MIN_LEVEL, Math.min(EQ_MAX_LEVEL, targetLevel));
 
 			const prev = musicVizState.smoothedLevels[i] ?? EQ_MIN_LEVEL;
 			let next = prev;
 			if (targetLevel > prev) {
-				const attackResponse =
-					prev > EQ_MAX_LEVEL * 0.7 ? EQ_ATTACK - 0.28 : EQ_ATTACK;
+				const isNearTop = prev > EQ_MAX_LEVEL * 0.62;
+				const attackResponse = isNearTop
+					? Math.max(0.2, EQ_ATTACK - 0.44)
+					: EQ_ATTACK;
 				next = prev + (targetLevel - prev) * attackResponse;
 			} else {
-				next = Math.max(targetLevel, prev - rollbackStep);
+				const releaseBoost = prev > EQ_MAX_LEVEL * 0.6 ? 1.45 : 1;
+				next = Math.max(targetLevel, prev - rollbackStep * releaseBoost);
 			}
 			const displayLevel = Math.max(EQ_MIN_LEVEL, Math.min(EQ_MAX_LEVEL, next));
 			musicVizState.smoothedLevels[i] = displayLevel;
