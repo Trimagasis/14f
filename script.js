@@ -68,8 +68,9 @@ function getMaxActiveCount() {
 }
 
 function getEqBarCountForViewport() {
-	if (window.innerWidth <= 375) return 88;
-	if (window.innerWidth < 700) return 112;
+	if (window.innerWidth <= 375) return 64;
+	if (window.innerWidth <= 430) return 76;
+	if (window.innerWidth < 700) return 96;
 	return EQ_BAR_COUNT_DESKTOP;
 }
 
